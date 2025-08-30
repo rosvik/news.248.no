@@ -31,8 +31,8 @@ pub struct Article {
 async fn main() {
     let app = Router::new().route("/", get(index().await));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    println!("Listening on http://localhost:3000");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:2341").await.unwrap();
+    println!("Listening on http://localhost:2341");
     axum::serve(listener, app).await.unwrap();
 }
 
