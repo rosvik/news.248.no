@@ -8,9 +8,13 @@
 <body>
     <h1>NRK</h1>
     <span id="content">{{#each articles}}
+        {{#if this.image}}
+            <img src="https://img.248.no/image.png?w=300&sampling=lanczos&url={{this.image}}" alt="{{this.title}}">
+        {{/if}}
         <h2>{{this.title}}</h2>
         <a href="{{this.link}}">{{this.link}}</a>
         <p>{{this.pub_date}}</p>
+        <hr>
     {{/each}}</span>
 </body>
 </html>
