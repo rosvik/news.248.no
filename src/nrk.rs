@@ -1,0 +1,74 @@
+use crate::Article;
+use scraper::{Html, Selector};
+use serde::Deserialize;
+
+const NRK_URL: &str = "https://www.nrk.no/nyheter";
+const OPENGRAPH_URL: &str = "https://og.248.no/api?url=";
+
+pub async fn nrk() -> Vec<Article> {
+    let feed_links = get_feed_links().await;
+    let mut articles = Vec::new();
+
+    for link in feed_links {
+        let article = get_opengraph_data(&link).await;
+        if let Some(article) = article {
+            articles.push(article);
+        }
+    }
+    articles
+}
+
+pub async fn get_feed_links() -> Vec<String> {
+    println!("Fetching feed links from {}", NRK_URL);
+    let resp = reqwest::get(NRK_URL).await.unwrap();
+
+    let html = Html::parse_document(resp.text().await.unwrap().as_str());
+    let selector = Selector::parse(".bulletin-time a").unwrap();
+
+    html.select(&selector)
+        .map(|e| e.value().attr("href").unwrap().to_string())
+        .collect::<Vec<String>>()
+}
+
+#[derive(Deserialize)]
+pub struct OpengraphTag {
+    pub property: String,
+    pub content: String,
+}
+pub type OpengraphData = Vec<OpengraphTag>;
+
+pub async fn get_opengraph_data(url: &str) -> Option<Article> {
+    let resp = reqwest::get(format!("{OPENGRAPH_URL}{url}")).await.unwrap();
+    let json = resp.json::<OpengraphData>().await.unwrap();
+    let title = json
+        .iter()
+        .find(|i| i.property == "og:title")
+        .unwrap_or(&OpengraphTag {
+            property: "og:title".to_string(),
+            content: "".to_string(),
+        })
+        .content
+        .clone();
+    let published_time = json
+        .iter()
+        .find(|i| i.property == "article:published_time")
+        .unwrap_or(&OpengraphTag {
+            property: "article:published_time".to_string(),
+            content: "".to_string(),
+        })
+        .content
+        .clone();
+
+    let image = json
+        .iter()
+        .find(|i| i.property == "og:image")
+        .map(|i| i.content.clone())
+        .clone();
+
+    Some(Article {
+        title,
+        link: url.to_string(),
+        published_time,
+        image,
+    })
+}

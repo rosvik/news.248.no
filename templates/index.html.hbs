@@ -12,7 +12,7 @@
             background-color: #1c1e27; color: #fff;
             margin: 30px;
         }
-        a { color: rgb(145, 145, 145) }
+        a { color: rgb(145, 145, 145); text-overflow: ellipsis; overflow: hidden; }
         hr {
             border: none;
             border-top: 1px solid rgba(145, 145, 145, .2);
@@ -30,19 +30,26 @@
 
 <body>
     <span id="content">
-        {{#each articles}}<div class="article">
-            {{#if this.image}}
-            <img src="https://img.248.no/image.png?w=200&sampling=lanczos&url={{this.image}}" alt="{{this.title}}" class="article-image">
-            {{else}}
-            <div class="article-image"></div>
-            {{/if}}
-            <div class="article-details">
-                <h2>{{this.title}}</h2>
-                <a href="{{this.link}}">{{this.link}}</a>
-                <p>{{this.pub_date}}</p>
+        {{#each publications}}
+        <h1>{{this.name}}</h1>
+        <a href="{{this.url}}">{{this.url}}</a>
+        <div class="articles">
+            {{#each this.articles}}<hr>
+            <div class="article">
+                {{#if this.image}}
+                <img src="https://img.248.no/image.png?w=200&sampling=lanczos&url={{this.image}}" alt="{{this.title}}" class="article-image">
+                {{else}}
+                <div class="article-image"></div>
+                {{/if}}
+                <div class="article-details">
+                    <h2>{{this.title}}</h2>
+                    <a href="{{this.link}}">{{this.link}}</a>
+                    <p>{{this.pub_date}}</p>
+                </div>
             </div>
+            {{/each}}
+            {{/each}}
         </div>
-        <hr>{{/each}}
     </span>
 </body>
 </html>
