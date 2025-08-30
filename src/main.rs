@@ -49,12 +49,12 @@ async fn index() -> Html<String> {
     let publications = vec![
         Publication {
             name: "NRK".to_string(),
-            url: "https://www.nrk.no".to_string(),
+            url: "https://www.nrk.no/nyheter".to_string(),
             articles: nrk,
         },
         Publication {
             name: "BBC".to_string(),
-            url: "https://www.bbc.com".to_string(),
+            url: "https://www.bbc.com/news/world".to_string(),
             articles: bbc,
         },
     ];
