@@ -29,7 +29,7 @@ pub struct Article {
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(index().await));
+    let app = Router::new().route("/", get(index));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:2341").await.unwrap();
     println!("Listening on http://localhost:2341");
@@ -42,7 +42,6 @@ async fn index() -> Html<String> {
         .register_template_file("index.html.hbs", "templates/index.html.hbs")
         .unwrap();
 
-    // let nrk =
     let bbc = rss::rss("https://feeds.bbci.co.uk/news/world/rss.xml").await;
     let nrk = nrk::nrk().await;
 
