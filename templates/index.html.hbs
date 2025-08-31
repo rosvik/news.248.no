@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>news</title>
     <style>
         * {
@@ -12,17 +13,16 @@
             gap: 10px;
         }
         body {
-            background-color: #1c1e27; color: #fff;
+            background-color: #1c1e27;
+            color: #fff;
             margin: 30px;
         }
         a, .article-link { color: rgb(145, 145, 145); }
-        hr {
-            border: none;
-            border-top: 1px solid rgba(145, 145, 145, .2);
-        }
+        hr { border: none; border-top: 1px solid rgba(145, 145, 145, .2); }
         #content {
             display: flex;
             flex-direction: row;
+            gap: 30px;
         }
         .publication { display: flex; flex-direction: column; flex: 1;}
         .publication-header {
@@ -31,16 +31,19 @@
             align-items: center;
         }
         .articles { display: flex; flex-direction: column; }
-        .article {
-            display: flex;
-            align-items: center;
-        }
+        .article { display: flex; align-items: center; }
         .article-image { max-width: 200px; }
         .article-details { display: flex; flex-direction: column; flex: 1; width: 0; }
         .article-link {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+        @media (max-width: 1100px) {
+            .article-image { max-width: 150px; }
+        }
+        @media (max-width: 900px) {
+            #content {flex-direction: column; }
         }
     </style>
 </head>
