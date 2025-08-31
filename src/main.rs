@@ -62,20 +62,23 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
     let nrk = nrk::nrk("https://www.nrk.no/nyheter").await;
 
     // Filter out articles published before midnight
-    let filtered_nrk = nrk
+    let mut filtered_nrk = nrk
         .iter()
         .filter(|a| {
             a.published_time >= midnight && a.published_time <= midnight + Duration::days(1)
         })
         .cloned()
         .collect::<Vec<_>>();
-    let filtered_bbc = bbc
+    filtered_nrk.sort_by(|a, b| b.published_time.cmp(&a.published_time));
+
+    let mut filtered_bbc = bbc
         .iter()
         .filter(|a| {
             a.published_time >= midnight && a.published_time <= midnight + Duration::days(1)
         })
         .cloned()
         .collect::<Vec<_>>();
+    filtered_bbc.sort_by(|a, b| b.published_time.cmp(&a.published_time));
 
     let publications = vec![
         Publication {
