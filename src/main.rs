@@ -3,7 +3,6 @@ use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, TimeZone};
 use chrono_tz::Tz;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 // https://www.nrk.no/norge/toppsaker.rss
 // https://www.nrk.no/nyheter/siste.rss
@@ -45,16 +44,17 @@ struct Parameters {
 }
 async fn index(Query(query): Query<Parameters>) -> Html<String> {
     let now = Local::now().with_timezone(&chrono_tz::Europe::Oslo);
-    let midnight: DateTime<Tz> =
+    let now_date = chrono_tz::Europe::Oslo
+        .with_ymd_and_hms(now.year(), now.month(), now.day(), 0, 0, 0)
+        .unwrap();
+    let selected_date: DateTime<Tz> =
         match NaiveDate::parse_from_str(query.date.unwrap_or_default().as_str(), "%Y-%m-%d") {
             Ok(date) => chrono_tz::Europe::Oslo
                 .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
                 .unwrap(),
             Err(e) => {
                 println!("Invalid date, using current date: {e}");
-                chrono_tz::Europe::Oslo
-                    .with_ymd_and_hms(now.year(), now.month(), now.day(), 0, 0, 0)
-                    .unwrap()
+                now_date
             }
         };
 
@@ -65,7 +65,8 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
     let mut filtered_nrk = nrk
         .iter()
         .filter(|a| {
-            a.published_time >= midnight && a.published_time <= midnight + Duration::days(1)
+            a.published_time >= selected_date
+                && a.published_time <= selected_date + Duration::days(1)
         })
         .cloned()
         .collect::<Vec<_>>();
@@ -74,7 +75,8 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
     let mut filtered_bbc = bbc
         .iter()
         .filter(|a| {
-            a.published_time >= midnight && a.published_time <= midnight + Duration::days(1)
+            a.published_time >= selected_date
+                && a.published_time <= selected_date + Duration::days(1)
         })
         .cloned()
         .collect::<Vec<_>>();
@@ -98,11 +100,31 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
         .register_template_file("index.html.hbs", "templates/index.html.hbs")
         .unwrap();
 
-    let rendered = template
-        .render(
-            "index.html.hbs",
-            &HashMap::from([("publications", publications)]),
-        )
-        .unwrap();
+    let next_date = match selected_date < now_date {
+        true => Some(
+            (selected_date + Duration::days(1))
+                .format("%Y-%m-%d")
+                .to_string(),
+        ),
+        false => None,
+    };
+
+    #[derive(Serialize)]
+    struct PageCtx {
+        publications: Vec<Publication>,
+        date: String,
+        previous_date: String,
+        next_date: Option<String>,
+    }
+    let ctx = PageCtx {
+        publications,
+        date: selected_date.format("%Y-%m-%d").to_string(),
+        previous_date: (selected_date - Duration::days(1))
+            .format("%Y-%m-%d")
+            .to_string(),
+        next_date,
+    };
+
+    let rendered = template.render("index.html.hbs", &ctx).unwrap();
     Html(rendered)
 }
