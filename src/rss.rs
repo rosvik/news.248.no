@@ -10,13 +10,33 @@ pub async fn rss(url: &str) -> Vec<Article> {
         .into_iter()
         .map(|item| {
             let image = get_image_url(&item);
-            Article {
-                title: item.title.unwrap(),
-                link: item.link.unwrap(),
-                published_time: item.pub_date.unwrap(),
+
+            let title = match item.title {
+                Some(title) => title,
+                None => return None,
+            };
+            let link = match item.link {
+                Some(link) => link,
+                None => return None,
+            };
+            let published_time: chrono::DateTime<chrono::Utc> = match item.pub_date {
+                Some(pub_date) => match chrono::DateTime::parse_from_rfc2822(&pub_date) {
+                    Ok(published_time) => published_time.into(),
+                    Err(_) => return None,
+                },
+                None => return None,
+            };
+
+            Some(Article {
+                title,
+                link,
+                published_time,
                 image,
-            }
+            })
         })
+        .collect::<Vec<Option<Article>>>()
+        .into_iter()
+        .flatten()
         .collect::<Vec<Article>>()
 }
 

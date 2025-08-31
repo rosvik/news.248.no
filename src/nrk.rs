@@ -2,11 +2,10 @@ use crate::Article;
 use scraper::{Html, Selector};
 use serde::Deserialize;
 
-const NRK_URL: &str = "https://www.nrk.no/nyheter";
 const OPENGRAPH_URL: &str = "https://og.248.no/api?url=";
 
-pub async fn nrk() -> Vec<Article> {
-    let feed_links = get_feed_links().await;
+pub async fn nrk(url: &str) -> Vec<Article> {
+    let feed_links = get_feed_links(url).await;
     let mut articles = Vec::new();
 
     for link in feed_links {
@@ -18,9 +17,9 @@ pub async fn nrk() -> Vec<Article> {
     articles
 }
 
-pub async fn get_feed_links() -> Vec<String> {
-    println!("Fetching feed links from {}", NRK_URL);
-    let resp = reqwest::get(NRK_URL).await.unwrap();
+pub async fn get_feed_links(url: &str) -> Vec<String> {
+    println!("Fetching feed links from {url}");
+    let resp = reqwest::get(url).await.unwrap();
 
     let html = Html::parse_document(resp.text().await.unwrap().as_str());
     let selector = Selector::parse(".bulletin-time a").unwrap();
@@ -57,7 +56,9 @@ pub async fn get_opengraph_data(url: &str) -> Option<Article> {
             content: "".to_string(),
         })
         .content
-        .clone();
+        .clone()
+        .parse::<chrono::DateTime<chrono::Utc>>()
+        .unwrap();
 
     let image = json
         .iter()
