@@ -26,11 +26,16 @@ pub async fn rss(url: &str) -> Vec<Article> {
                 },
                 None => return None,
             };
+            let formatted_published_time = published_time
+                .with_timezone(&chrono_tz::Europe::Oslo)
+                .format("%Y-%m-%d %H:%M:%S")
+                .to_string();
 
             Some(Article {
                 title,
                 link,
                 published_time,
+                formatted_published_time,
                 image,
             })
         })

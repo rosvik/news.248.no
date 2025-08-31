@@ -26,6 +26,7 @@ pub struct Article {
     pub title: String,
     pub link: String,
     pub published_time: chrono::DateTime<chrono::Utc>,
+    pub formatted_published_time: String,
     pub image: Option<String>,
 }
 
