@@ -8,8 +8,10 @@ use serde::{Deserialize, Serialize};
 // https://www.nrk.no/nyheter/siste.rss
 // https://feeds.bbci.co.uk/news/world/rss.xml
 
+mod db;
 mod nrk;
 mod rss;
+mod scheduler;
 
 #[derive(Debug, Serialize)]
 #[allow(dead_code)]
@@ -31,6 +33,25 @@ pub struct Article {
 
 #[tokio::main]
 async fn main() {
+    db::init();
+    db::add_publication(
+        db::NRK_ID,
+        Publication {
+            name: "NRK".to_string(),
+            url: "https://www.nrk.no/nyheter".to_string(),
+            articles: vec![],
+        },
+    );
+    db::add_publication(
+        db::BBC_ID,
+        Publication {
+            name: "BBC".to_string(),
+            url: "https://www.bbc.com/news/world".to_string(),
+            articles: vec![],
+        },
+    );
+    scheduler::start_scheduler().await.unwrap();
+
     let app = Router::new().route("/", get(index));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:2341").await.unwrap();
