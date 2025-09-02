@@ -7,7 +7,7 @@ pub const BBC_ID: &str = "BBC";
 pub fn init() -> Connection {
     let conn = Connection::open("./news.db").unwrap();
     conn.execute_batch("PRAGMA foreign_keys = ON;").unwrap();
-    conn.execute_batch(include_str!("init.sql")).unwrap();
+    conn.execute_batch(include_str!("../sql/init.sql")).unwrap();
     conn
 }
 
@@ -27,7 +27,7 @@ pub fn add_article(article: Article, publication_id: &str) {
     }
 
     conn.execute(
-        include_str!("add_article.sql"),
+        include_str!("../sql/add_article.sql"),
         (
             article.id,
             publication_id,
@@ -55,7 +55,7 @@ pub fn add_publication(id: &str, publication: Publication) {
         return;
     }
     conn.execute(
-        include_str!("add_publication.sql"),
+        include_str!("../sql/add_publication.sql"),
         (id, publication.name, publication.url),
     )
     .unwrap();
