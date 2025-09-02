@@ -31,7 +31,10 @@ pub async fn rss(url: &str) -> Vec<Article> {
                 .format("%Y-%m-%d %H:%M:%S")
                 .to_string();
 
+            let id = item.guid.unwrap().value;
+
             Some(Article {
+                id,
                 title,
                 link,
                 published_time,

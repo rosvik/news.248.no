@@ -24,6 +24,7 @@ pub struct Publication {
 #[derive(Debug, Serialize, Clone)]
 #[allow(dead_code)]
 pub struct Article {
+    pub id: String,
     pub title: String,
     pub link: String,
     pub published_time: chrono::DateTime<chrono::Utc>,

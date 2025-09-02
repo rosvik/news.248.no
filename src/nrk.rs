@@ -71,7 +71,15 @@ pub async fn get_opengraph_data(url: &str) -> Option<Article> {
         .map(|i| i.content.clone())
         .clone();
 
+    let id = url.split("/").last().unwrap().to_string();
+    // Santiy check, ID should start with "1."
+    if id[..2] != *"1." {
+        println!("Got invalid ID: {id} for url {url}");
+        return None;
+    }
+
     Some(Article {
+        id,
         title,
         link: url.to_string(),
         published_time,

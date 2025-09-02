@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS publications (
 );
 
 CREATE TABLE IF NOT EXISTS articles (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   publication_id TEXT NOT NULL,
   title TEXT NOT NULL,
   link TEXT NOT NULL,

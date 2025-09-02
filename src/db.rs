@@ -13,9 +13,23 @@ pub fn init() -> Connection {
 
 pub fn add_article(article: Article, publication_id: &str) {
     let conn = Connection::open("./news.db").unwrap();
+
+    // Skip if article already exists
+    let existing = conn
+        .query_row(
+            "SELECT COUNT(*) FROM articles WHERE id = ?",
+            [&article.id],
+            |row| row.get::<_, i64>(0),
+        )
+        .unwrap();
+    if existing > 0 {
+        return;
+    }
+
     conn.execute(
         include_str!("add_article.sql"),
         (
+            article.id,
             publication_id,
             article.title,
             article.link,
