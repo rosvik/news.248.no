@@ -74,10 +74,7 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
             Ok(date) => chrono_tz::Europe::Oslo
                 .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
                 .unwrap(),
-            Err(e) => {
-                println!("Invalid date, using current date: {e}");
-                now_date
-            }
+            Err(_) => now_date,
         };
 
     let bbc = db::get_articles(db::BBC_ID);
