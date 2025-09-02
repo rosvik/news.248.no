@@ -2,10 +2,7 @@ use crate::{db, nrk, rss};
 use tokio_cron_scheduler::{Job, JobScheduler};
 
 // Every 15 minutes
-// const CRON_STRING: &str = "0 */15 * * * *";
-
-// Every 10 seconds
-const CRON_STRING: &str = "1/10 * * * * *";
+const CRON_STRING: &str = "0 */15 * * * *";
 
 pub async fn start_scheduler() -> Result<JobScheduler, Box<dyn std::error::Error>> {
     let mut scheduler = JobScheduler::new().await?;
