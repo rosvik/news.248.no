@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{Article, Publication};
 use rusqlite::Connection;
 
@@ -59,4 +61,26 @@ pub fn add_publication(id: &str, publication: Publication) {
         (id, publication.name, publication.url),
     )
     .unwrap();
+}
+
+pub fn get_articles(publication_id: &str) -> Vec<Article> {
+    let conn = Connection::open("./news.db").unwrap();
+    let mut statements = conn
+        .prepare("SELECT * FROM articles WHERE publication_id = ?")
+        .unwrap();
+    statements
+        .query_map([publication_id], |row| {
+            Ok(Article {
+                id: row.get(0)?,
+                title: row.get(2)?,
+                link: row.get(3)?,
+                published_time: chrono::DateTime::from_str(row.get::<_, String>(4)?.as_str())
+                    .unwrap(),
+                formatted_published_time: row.get(5)?,
+                image: row.get(6)?,
+            })
+        })
+        .unwrap()
+        .flatten()
+        .collect::<Vec<Article>>()
 }

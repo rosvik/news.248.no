@@ -80,8 +80,8 @@ async fn index(Query(query): Query<Parameters>) -> Html<String> {
             }
         };
 
-    let bbc = rss::rss("https://feeds.bbci.co.uk/news/world/rss.xml").await;
-    let nrk = nrk::nrk("https://www.nrk.no/nyheter").await;
+    let bbc = db::get_articles(db::BBC_ID);
+    let nrk = db::get_articles(db::NRK_ID);
 
     // Filter out articles published before midnight
     let mut filtered_nrk = nrk
